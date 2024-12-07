@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="login-container">
     <h1>Login</h1>
 
     <span>login</span><input type="text" v-model="login">
@@ -8,15 +8,14 @@
     <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
     <p v-if="shopUser">{{shopUser}}</p>
   </div>
-
 </template>
 
 <script>
-
 import {mapState, mapActions} from 'vuex'
+
 export default {
   name: 'ShopLoginView',
-  data(){
+  data() {
     return {
       login: '',
       password: '',
@@ -44,3 +43,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+</style>

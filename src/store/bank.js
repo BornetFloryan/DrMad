@@ -21,7 +21,6 @@ const mutations = {
 // actions = fonctions asynchrone pour mettre à jour le state, en faisant appel aux mutations, via la fonction commit()
 const actions = {
     async getAccountAmount({commit}, data) {
-        console.log('récupération du montant du compte');
         let response = await BankService.getAccountAmount(data)
         if (response.error === 0) {
             commit('updateAccountAmount', response.data)
@@ -29,11 +28,10 @@ const actions = {
         }
         else {
             commit('updateAccountNumberError', -1)
-            console.log(response.data)
+            return response;
         }
     },
     async getAccountTransaction({commit}, data) {
-        console.log("récupération des transactions du compte");
         let response = await BankService.getAccountTransaction(data)
         if (response.error === 0) {
             commit('updateAccountTransactions', response.data)
@@ -41,7 +39,7 @@ const actions = {
         }
         else {
             commit('updateAccountNumberError', -1)
-            console.log(response.data)
+            return response;
         }
     },
 };

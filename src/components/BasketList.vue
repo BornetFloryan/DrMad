@@ -1,45 +1,73 @@
 <template>
   <div>
-    <h1>Panier</h1>
-    <div v-for="item in basket" :key="item.item._id" class="basket-item">
-      <span>{{ item.item.name }} x {{ item.amount }}</span>
-    </div>
-    <div class="total">
-      <span>Total: {{ totalAmount }}</span>
-    </div>
+    <CheckedList
+        :data="processedData"
+        :fields="['name', 'amount']"
+        :itemCheck="false"
+        :checked="checked"
+        :itemButton="{ show: true, text: 'Supprimer' }"
+        :listButton="{ show: true, text: 'Vider le panier' }"
+        @item-button-clicked="removeItem"
+        @list-button-clicked="handleClearBasket"
+    />
     <button @click="createOrder">Acheter</button>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import CheckedList from './CheckedList.vue';
+import ShopService from "@/services/shop.service";
 
 export default {
   name: 'BasketList',
+  components: {
+    CheckedList,
+  },
+  data: () => ({
+    checked: [],
+  }),
   computed: {
-    ...mapState('shop', ['basket']),
-    totalAmount() {
-      return this.basket.reduce((total, item) => total + item.item.price * item.amount, 0);
+    ...mapState('shop', ['basket', 'shopUser']),
+    processedData() {
+      return this.basket.items.map(item => ({
+        name: item.item.name,
+        amount: item.amount,
+        ...item
+      }));
     }
   },
   methods: {
-    ...mapActions('shop', ['createOrder']),
+    ...mapActions('shop', ['getBasket', 'removeItemFromBasket', 'clearBasket']),
+    removeItem({index}) {
+      const item = this.basket.items[index];
+      this.removeItemFromBasket({login: this.shopUser, item: item});
+    },
+    handleClearBasket() {
+      this.clearBasket();
+    },
     async createOrder() {
-      const order = await this.createOrder();
-      alert(`Commande créée avec l'UUID: ${order.uuid}`);
-    }
-  }
+      const userId = this.shopUser._id;
+      const orderData = {
+        userId,
+        items: this.basket.items,
+      };
+      const response = await ShopService.createOrder(orderData);
+      if (response.error === 0) {
+        this.clearBasket();
+        let orderId = response.data.uuid;
+        this.$router.push({ name: 'shoppay', params: { orderId } });
+      } else {
+        console.error('Failed to place order:', response.data);
+      }
+    },
+  },
+  created() {
+    this.getBasket(this.shopUser);
+  },
 };
 </script>
 
 <style scoped>
-.basket-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.total {
-  margin-top: 20px;
-  font-weight: bold;
-}
+/* Add your component-specific styles here */
 </style>

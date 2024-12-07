@@ -1,17 +1,17 @@
 <template>
   <div>
     <h1>Les virus</h1>
-    <p>{{basket}}</p>
     <CheckedList
         :data="viruses"
         :fields="['name', 'price', 'promotion']"
         :item-check="true"
-        :checked="[]"
+        :checked="checked"
         :itemButton="{ show: true, text: 'Ajouter au panier' }"
         :listButton="{ show: true, text: 'Ajouter tous au panier' }"
         :itemAmount="true"
         @item-button-clicked="handleAddItemToBasket"
         @list-button-clicked="handleAddSelectedItemsToBasket"
+        @checked-changed="updateChecked"
     />
   </div>
 </template>
@@ -25,6 +25,9 @@ export default {
   components: {
     CheckedList
   },
+  data: () => ({
+    checked: [],
+  }),
   computed: {
     ...mapState({
       viruses: state => state.shop.viruses,
@@ -34,17 +37,29 @@ export default {
   },
   methods: {
     ...mapActions('shop', ['addItemToBasket', 'removeItemFromBasket']),
+    updateChecked(index) {
+      this.$set(this.checked, index, !this.checked[index]);
+    },
     async handleAddItemToBasket({index, amount}) {
-      let response = await this.addItemToBasket({login: this.currentUser, item: this.viruses[index], quantity: amount});
+      let response = await this.addItemToBasket({
+        login: this.currentUser,
+        item: this.viruses[index],
+        quantity: amount});
       if (response && response.error) {
         alert(response.data);
       }
     },
-    handleAddSelectedItemsToBasket(selectedItems) {
-      selectedItems.forEach(({index, amount}) => {
-        this.handleAddItemToBasket({login: this.currentUser, item: this.viruses[index], amount});
-      });
-    }
+    async handleAddSelectedItemsToBasket(selectedItems) {
+      for (const {index, amount} of selectedItems) {
+        let response = await this.handleAddItemToBasket({
+          index: index,
+          amount: amount
+        });
+        if (response && response.error) {
+          alert(response.data);
+        }
+      }
+    },
   }
 };
 </script>

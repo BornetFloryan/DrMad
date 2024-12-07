@@ -39,12 +39,14 @@ const routes = [
         }
       },
       {
-        path: 'pay/:orderId',
+        path: '/shop/pay/:orderId',
         name: 'shoppay',
         components: {
           shopmain: ShopPay,
         },
-        props: route => ({ orderId: route.params.orderId })
+        props: {
+          shopmain: true
+        }
       },
       {
         path: 'orders',

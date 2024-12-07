@@ -21,9 +21,34 @@ async function updateBasketFromLocalSource(data) {
     return LocalSource.updateBasket(data)
 }
 
-async function getBasketFromLocalSource() {
+async function getBasketFromLocalSource(data) {
     // rÃ©cupÃ©ration auprÃ¨s de la source locale
-    return LocalSource.getBasket()
+    return LocalSource.getBasket(data)
+}
+
+async function removeItemFromBasketFromLocalSource(data) {
+    // rÃ©cupÃ©ration auprÃ¨s de la source locale
+    return LocalSource.removeItemFromBasket(data)
+}
+
+async function createOrderFromLocalSource(data) {
+    // rÃ©cupÃ©ration auprÃ¨s de la source locale
+    return LocalSource.createOrder(data)
+}
+
+async function finalizeOrderFromLocalSource(orderId, userId) {
+    // rÃ©cupÃ©ration auprÃ¨s de la source locale
+    return LocalSource.finalizeOrder(orderId, userId)
+}
+
+async function getOrdersFromLocalSource(userId) {
+    // rÃ©cupÃ©ration auprÃ¨s de la source locale
+    return LocalSource.getOrders(userId)
+}
+
+async function cancelOrderFromLocalSource(orderId, userId) {
+    // rÃ©cupÃ©ration auprÃ¨s de la source locale
+    return LocalSource.cancelOrder(orderId, userId)
 }
 
 /*
@@ -73,17 +98,73 @@ async function updateBasket(data) {
     return response
 }
 
-async function getBasket() {
+async function getBasket(data) {
     let response = null;
     try {
         // changer la mÃ©thode appelÃ©e quand cette fonctionnalitÃ© l'API est prÃªte
-        response = await getBasketFromLocalSource()
+        response = await getBasketFromLocalSource(data)
     }
         // NB: le catch n'aura lieu que pour des requÃªte vers l'API, s'il y a une erreur rÃ©seau
     catch(err) {
-        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de rÃ©cupÃ©rer le panier'  }
+        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de récupérer le panier'  }
     }
     return response
+}
+
+async function removeItemFromBasket(data) {
+    let response = null;
+    try {
+        // changer la mÃ©thode appelÃ©e quand cette fonctionnalitÃ© l'API est prÃªte
+        response = await removeItemFromBasketFromLocalSource(data)
+    }
+        // NB: le catch n'aura lieu que pour des requÃªte vers l'API, s'il y a une erreur rÃ©seau
+    catch(err) {
+        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de mettre Ã  jour le panier'  }
+    }
+    return response
+}
+
+async function createOrder(data) {
+    let response = null;
+    try {
+        // changer la mÃ©thode appelÃ©e quand cette fonctionnalitÃ© l'API est prÃªte
+        response = await createOrderFromLocalSource(data)
+    }
+        // NB: le catch n'aura lieu que pour des requÃªte vers l'API, s'il y a une erreur rÃ©seau
+    catch(err) {
+        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de passer la commande'  }
+    }
+    return response
+}
+
+async function finalizeOrder(orderId, userId) {
+    let response = null;
+    try {
+        response = await finalizeOrderFromLocalSource(orderId, userId);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'Network error, unable to finalize order' };
+    }
+    return response;
+}
+
+async function getOrders(userId) {
+    let response = null;
+    try {
+        response = await getOrdersFromLocalSource(userId);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'Network error, unable to get orders' };
+    }
+    return response;
+}
+
+async function cancelOrder(orderId, userId) {
+    let response = null;
+    try {
+        response = await cancelOrderFromLocalSource(orderId, userId);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'Network error, unable to cancel order' };
+    }
+    return response;
 }
 
 export default {
@@ -91,4 +172,9 @@ export default {
     getAllViruses,
     updateBasket,
     getBasket,
+    removeItemFromBasket,
+    createOrder,
+    finalizeOrder,
+    getOrders,
+    cancelOrder,
 }

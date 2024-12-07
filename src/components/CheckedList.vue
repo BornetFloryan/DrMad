@@ -11,6 +11,7 @@
             type="number"
             v-model.number="inputValues[index]"
             placeholder="Quantité"
+            min="0"
         />
         <button v-if="itemButton.show" @click="itemButtonClicked(index, inputValues[index])">{{ itemButton.text }}</button>
       </li>
@@ -46,7 +47,9 @@ export default {
     },
     listButtonClicked() {
       const selectedViruses = this.data
-          .map((item, index) => ({ index, amount: this.inputValues[index] ? this.inputValues[index] : undefined }))
+          .map((item, index) => ({
+            index,
+            amount: this.inputValues[index] ? this.inputValues[index] : undefined }))
           .filter((item, index) => this.checked[index]);
       this.$emit('list-button-clicked', selectedViruses);
     },

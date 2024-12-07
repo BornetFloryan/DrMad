@@ -1,10 +1,12 @@
 import ShopService from '../services/shop.service'
-import {items} from "@/datasource/data";
+import { items, shopusers } from "@/datasource/data";
 
 const state = () => ({
     viruses: [],
     shopUser: null,
-    basket: [],
+    basket: {
+        items: []
+    },
 });
 
 const mutations = {
@@ -12,25 +14,91 @@ const mutations = {
         state.viruses = viruses;
     },
     updateShopUser(state, user) {
-        state.shopUser = user;
-    },
-    updateBasket(state, basket) {
-        state.basket = basket;
+        if (user) {
+            const foundUser = shopusers.find(u => u._id === user._id);
+            state.shopUser = foundUser || user;
+            state.basket = state.shopUser.basket || { items: [] };
+        } else {
+            state.shopUser = null;
+            state.basket = { items: [] };
+        }
     },
     addItemToBasket(state, data) {
-        const existingItem = state.basket.find(basketItem => basketItem.item._id === data.item._id);
-        items.find(e => e._id === data.item._id).stock -= data.quantity;
+        const foundUser = shopusers.find(u => u._id === state.shopUser._id);
+
+        if (!state.basket || !foundUser.basket) {
+            state.basket = { items: [] };
+            foundUser.basket = state.basket;
+        }
+        if (!state.basket.items || !foundUser.basket.items) {
+            state.basket.items = [];
+            foundUser.basket.items = state.basket.items;
+        }
+
+        const existingItem = state.basket.items.find(basketItem => basketItem.item._id === data.item._id);
+        const item = items.find(e => e._id === data.item._id);
+        if (item) {
+            item.stock -= data.quantity;
+        }
         if (existingItem) {
             existingItem.amount += data.quantity;
         } else {
-            state.basket.push({ item: data.item, amount: data.quantity });
+            state.basket.items.push({ item: data.item, amount: data.quantity });
+        }
+        if (state.shopUser) {
+            if (foundUser) {
+                foundUser.basket.items = state.basket.items;
+            }
         }
     },
     removeItemFromBasket(state, data) {
-        state.basket = state.basket.filter(basketItem => basketItem._id !== data.item._id);
+        const item = items.find(e => e._id === data.item.item._id);
+        if (item) {
+            item.stock += data.item.amount;
+        }
+
+        state.basket.items = state.basket.items.filter(basketItem => basketItem.item._id !== data.item.item._id);
+        if (state.shopUser) {
+            const foundUser = shopusers.find(u => u._id === state.shopUser._id);
+            if (foundUser) {
+                foundUser.basket.items = state.basket.items;
+            }
+        }
     },
     clearBasket(state) {
-        state.basket = [];
+        if (state.shopUser) {
+            const foundUser = shopusers.find(u => u._id === state.shopUser._id);
+            if (foundUser) {
+                foundUser.basket.items.forEach(item => {
+                    const foundItem = items.find(e => e._id === item.item._id);
+                    if (foundItem) {
+                        foundItem.stock += item.amount;
+                    }
+                });
+                foundUser.basket.items = [];
+            }
+        }
+        state.basket.items = [];
+    },
+    setOrders(state, orders) {
+        const foundUser = shopusers.find(u => u._id === state.shopUser._id);
+        if (foundUser) {
+            foundUser.orders = orders;
+        }
+        state.shopUser.orders = orders;
+    },
+    updateOrderStatus(state, { orderId, status }) {
+        const foundUser = shopusers.find(u => u._id === state.shopUser._id);
+        if (foundUser) {
+            const order = foundUser.orders.find(order => order.uuid === orderId);
+            if (order) {
+                order.status = status;
+            }
+        }
+        const order = state.shopUser.orders.find(order => order.uuid === orderId);
+        if (order) {
+            order.status = status;
+        }
     }
 };
 
@@ -51,20 +119,19 @@ const actions = {
         if (response.error === 0) {
             commit('updateViruses', response.data);
         } else {
-            console.log(response.data);
+            return response;
         }
     },
-    async getBasket({ commit }) {
-        let response = await ShopService.getBasket(state.shopUser.login);
+    async getBasket({commit}, data){
+        let response = await ShopService.getBasket(data);
         if (response.error === 0) {
-            commit('updateBasket', response.data);
+            commit('updateShopUser', response.data);
         } else {
             return response;
         }
     },
     async addItemToBasket({ commit }, data) {
         let response = await ShopService.updateBasket(data);
-        console.log(response);
         if (response.error === 0) {
             commit('addItemToBasket', response.data);
         } else {
@@ -72,21 +139,32 @@ const actions = {
         }
     },
     async removeItemFromBasket({ commit }, data) {
-        let response = await ShopService.updateBasket(data);
+        let response = await ShopService.removeItemFromBasket(data);
         if (response.error === 0) {
             commit('removeItemFromBasket', response.data);
         } else {
             return response;
         }
     },
-    async clearBasket({ commit }, data) {
-        let response = await ShopService.updateBasket(data);
+    async clearBasket({ commit }) {
+        commit('clearBasket');
+    },
+    async fetchOrders({ commit }, userId) {
+        let response = await ShopService.getOrders(userId);
         if (response.error === 0) {
-            commit('clearBasket');
+            commit('setOrders', response.data);
         } else {
             return response;
         }
-    }
+    },
+    async cancelOrder({ commit }, {orderId, userId}) {
+        let response = await ShopService.cancelOrder(orderId, userId);
+        if (response.error === 0) {
+            commit('updateOrderStatus', response.data);
+        } else {
+            return response;
+        }
+    },
 };
 
 export default {

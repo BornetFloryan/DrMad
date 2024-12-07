@@ -20,7 +20,7 @@ export default {
     loggedTitles: [
       { text: "Accueil", color: "yellow" },
       { text: "Logout", color: "green" },
-      { text: "Acheter", color: "blue" },
+      { text: "Acheter", color: "pink" },
       { text: "Payer", color: "yellow" },
       { text: "Mes commandes", color: "purple" },
     ]

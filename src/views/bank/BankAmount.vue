@@ -1,17 +1,37 @@
 <template>
   <div>
-    <h1>Solde du compte</h1>
-    <p>{{ accountAmount }}</p>
+    <h1>Solde du compte courant</h1>
+    <label>Solde actuel : </label>
+    <input v-model="accountAmount" :class="amountClass" disabled>€
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import {mapActions, mapState} from 'vuex';
 
 export default {
-  name: 'BankAmount',
+  name: 'AccountBalance',
   computed: {
-    ...mapState('bank', ['accountAmount'])
+    ...mapState('bank', ['accountAmount', 'bankAccount']),
+    amountClass() {
+      return this.accountAmount >= 0 ? 'positive' : 'negative';
+    }
+  },
+  methods: {
+    ...mapActions('bank', ['getAccountAmount', 'getAccountTransactions']),
+  },
+  mounted() {
+    this.getAccountAmount(this.bankAccount);
   }
 };
 </script>
+
+<style scoped>
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}
+</style>

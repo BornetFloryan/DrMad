@@ -28,7 +28,7 @@
 
     <div v-if="filterStockActive">
       <label for="filterstock">En stock : </label>
-      <input type = "checkbox" v-model="stockFilter" id="filterstock">
+      <input type="checkbox" v-model="stockFilter" id="filterstock">
     </div>
     <CheckedList
         :data="filteredViruses"
@@ -55,10 +55,10 @@ export default {
   data: () => ({
     priceFilter: 0,
     nameFilter: "",
-    stockFilter : false,
-    filterPriceActive : false,
-    filterNameActive : false,
-    filterStockActive : false,
+    stockFilter: false,
+    filterPriceActive: false,
+    filterNameActive: false,
+    filterStockActive: false,
     checked: [],
   }),
   computed: {
@@ -75,7 +75,7 @@ export default {
     },
   },
   methods: {
-    showItemDetails({ index, amount }) {
+    showItemDetails({index, amount}) {
       const virus = this.filteredViruses[index];
       let message = `Id: ${virus._id}\n Nom: ${virus.name}\nStock: ${virus.stock}\nEn vente: ${virus.stock > 0 ? 'Oui' : 'Non'}`;
       if (amount !== null && amount !== undefined) {

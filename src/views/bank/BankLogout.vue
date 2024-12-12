@@ -5,12 +5,21 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: 'BankLogout',
   created() {
-    setTimeout(() => {
-      // Clear store and redirect to bank home
-    }, 1000);
+    this.logout();
+  },
+  methods: {
+    ...mapActions('bank', ['bankLogout']),
+    logout() {
+      this.bankLogout();
+      setTimeout(() => {
+        this.$router.push('/bank');
+      }, 1000);
+    }
   }
 };
 </script>

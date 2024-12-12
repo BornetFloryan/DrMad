@@ -1,23 +1,19 @@
 <template>
-  <div class="vertical-menu">
+  <div>
     <div v-for="item in items" :key="item.label">
-      <template v-if="item.type === 'title'">
-        <slot name="menu-title" :label="item.label">
-          <div class="menu-title">{{ item.label }}</div>
-        </slot>
-      </template>
-      <template v-else-if="item.type === 'link'">
-        <router-link :to="item.to" class="menu-link">
-          <slot name="menu-link" :label="item.label">
-            <button>{{ item.label }}</button>
-          </slot>
-        </router-link>
-      </template>
+      <div v-if="item.type === 'title'">
+        <strong><u>{{ item.label }}</u></strong>
+      </div>
+      <button v-else :disabled="!bankAccount" @click="navigate(item.to)">
+        {{ item.label }}
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
   name: 'VerticalMenu',
   props: {
@@ -25,21 +21,19 @@ export default {
       type: Array,
       required: true
     }
-  }
+  },
+  computed: {
+    ...mapState('bank', ['bankAccount']),
+  },
+  methods: {
+    navigate(to) {
+      if (this.$route.path !== to) {
+        this.$router.push(to);
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.vertical-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.menu-title {
-  font-weight: bold;
-  text-decoration: underline;
-}
-.menu-link {
-  text-decoration: none;
-}
 </style>

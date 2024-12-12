@@ -1,41 +1,79 @@
 import {bankaccounts, transactions} from "@/datasource/data";
+import {v4 as uuidv4} from "uuid";
 
 function getAccount(data){
-    if (!data) return { error: 1, status: 404, data: 'aucun compte' }
+    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
     let account = bankaccounts.find(e => e.number === data.number)
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
     return { error: 0, status: 200, data: account }
 }
 
-function getTransactions(data){
-    if (!data) return { error: 1, status: 404, data: 'aucun compte' }
-    let account = bankaccounts.find(e => e.number === data.number)
-    if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
-    let accountTransactions = transactions.filter(e => e.account === account._id)
-    return { error: 0, status: 200, data: accountTransactions }
-}
-
 function createWithdrawal(data){
-    if (!data) return { error: 1, status: 404, data: 'aucun compte' }
+    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
     let account = bankaccounts.find(e => e.number === data.number)
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
     if (account.amount < data.amount) return { error: 1, status: 404, data: 'solde insuffisant' }
-    account.amount -= data.amount
-    return { error: 0, status: 200, data: account.amount }
+
+    const transaction = {
+        _id: uuidv4(),
+        amount: -data.amount,
+        account: data.number,
+        date: { $date: new Date().toISOString() },
+        uuid: uuidv4()
+    };
+
+    transactions.push(transaction);
+
+    let respData = {
+        amount: data.amount,
+        transaction: transaction,
+    }
+
+    return { error: 0, status: 200, data: respData }
 }
 
-function createPayment(data){
-    if (!data) return { error: 1, status: 404, data: 'aucun compte' }
+function createPayment(data) {
+    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
     let account = bankaccounts.find(e => e.number === data.number)
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
-    account.amount += data.amount
-    return { error: 0, status: 200, data: account.amount }
+    if (account.amount < data.amount) return { error: 1, status: 404, data: 'solde insuffisant' }
+
+    let recipientAccount = bankaccounts.find(e => e.number === data.recipient)
+    if (!recipientAccount) return { error: 1, status: 404, data: 'compte destinataire incorrect' }
+
+    const transaction = {
+        _id: uuidv4(),
+        amount: -data.amount,
+        account: data.number,
+        date: { $date: new Date().toISOString() },
+        uuid: uuidv4()
+    };
+
+    const recipientTransaction = {
+        _id: uuidv4(),
+        amount: data.amount,
+        account: data.recipient,
+        date: { $date: new Date().toISOString() },
+        uuid: uuidv4()
+    };
+
+    transactions.push(transaction);
+    transactions.push(recipientTransaction);
+
+    recipientAccount.amount += data.amount;
+
+    let respData = {
+        amount: data.amount,
+        transaction: transaction,
+    }
+
+    return { error: 0, status: 200, data: respData }
 }
 
-function getAccountAmount(number) {
-    if (!number) return { error: 1, status: 404, data: 'aucun compte' }
+function getAccountAmount(data) {
+    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
 
-    let account = bankaccounts.find(e => e.number === number.number)
+    let account = bankaccounts.find(e => e.number === data.number)
 
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
 
@@ -43,9 +81,9 @@ function getAccountAmount(number) {
     return { error: 0, status: 200, data: amount }
 }
 
-function getAccountTransaction(number) {
-    if (!number) return { error: 1, status: 404, data: 'aucun compte' }
-    let account = bankaccounts.find(e => e.number === number.number)
+function getAccountTransactions(data) {
+    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
+    let account = bankaccounts.find(e => e.number === data.number)
     if (!account) return { error: 1, status: 404, data: "compte incorrect" }
     let accountTransactions = transactions.filter(e => e.account === account._id)
 
@@ -63,9 +101,8 @@ function getAccountTransaction(number) {
 
 export default {
     getAccount,
-    getTransactions,
     createWithdrawal,
     createPayment,
     getAccountAmount,
-    getAccountTransaction,
+    getAccountTransactions,
 }

@@ -11,7 +11,7 @@
             type="number"
             v-model.number="inputValues[index]"
             placeholder="Quantité"
-            min="0"
+            min="1"
         />
         <button v-if="itemButton.show" @click="itemButtonClicked(index, inputValues[index])">{{ itemButton.text }}</button>
       </li>

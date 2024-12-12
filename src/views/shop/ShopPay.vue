@@ -5,8 +5,10 @@
       <label for="orderId">Order ID:</label>
       <input type="text" v-model="localOrderId" id="orderId">
     </div>
+    <p>Date: {{ orderDetails.date }}</p>
+    <p>Total: {{ orderDetails.total }}</p>
     <div>
-      <label for="orderId">Order ID:</label>
+      <label for="transactionId">UUID de transaction bancaire:</label>
       <input v-model="transactionId" placeholder="UUID de transaction bancaire" id="transactionId" />
     </div>
     <button @click="payOrder">Payer</button>
@@ -16,25 +18,32 @@
 
 <script>
 import ShopService from "@/services/shop.service";
-import {mapState} from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: 'ShopPay',
   props: {
     orderId: {
       type: String,
-      required: true
+      default: ''
     },
   },
   data() {
     return {
-      localOrderId: this.orderId,
+      localOrderId: this.orderId || '',
       transactionId: '',
       errorMessage: ''
     };
   },
   computed: {
-    ...mapState('shop', ['shopUser'])
+    ...mapState('shop', ['shopUser']),
+    orderDetails() {
+      if (!this.shopUser || !this.shopUser.orders) {
+        return { date: '', total: '' };
+      }
+      const order = this.shopUser.orders.find(order => order.uuid === this.localOrderId);
+      return order ? { date: order.date.$date, total: order.total } : { date: '', total: '' };
+    }
   },
   methods: {
     async payOrder() {
@@ -50,6 +59,7 @@ export default {
         this.errorMessage = 'An error occurred during payment.';
         console.error(error);
       }
+      this.localOrderId = '';
     }
   }
 };

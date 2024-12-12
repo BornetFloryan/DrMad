@@ -13,14 +13,23 @@ export default {
   name: 'BankAccount',
   data() {
     return {
-      accountNumber: ''
+      accountNumber: null,
     };
   },
   methods: {
     ...mapActions('bank', ['getAccount']),
     async validateAccount() {
-      await this.getAccount({number: this.accountNumber});
-    }
-  }
+      try {
+        let response = await this.getAccount({ number: this.accountNumber });
+        if (response && response.error) {
+          alert(response.data);
+        } else {
+          this.$router.push({ name: 'bankamount' });
+        }
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    },
+  },
 };
 </script>

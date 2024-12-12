@@ -119,12 +119,15 @@ async function createOrder(data) {
       },
       amount: item.amount,
     })),
-    date: new Date(),
-    total: data.items.reduce((total, item) => {
-      const discount = item.item.promotion.reduce((acc, promo) => acc + promo.discount, 0);
-      return total + (item.item.price - discount) * item.amount;
-    }, 0),
+    date: { $date: new Date().toISOString() },
     status: 'waiting_payment',
+    total: data.items.reduce((total, item) => {
+      const applicablePromotion = item.item.promotion
+          .filter(promo => item.amount >= promo.amount)
+          .sort((a, b) => b.amount - a.amount)[0];
+      const discount = applicablePromotion ? applicablePromotion.discount : 0;
+      return total + (item.item.price * item.amount) * (1 - discount / 100);
+    }, 0),
     uuid: uuidv4(),
   };
 

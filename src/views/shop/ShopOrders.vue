@@ -3,6 +3,7 @@
     <h1>Mes Commandes</h1>
     <ul>
       <li v-for="order in orders" :key="order.uuid">
+        <p>Date : {{order.date.$date}}</p>
         <p>Montant: {{ order.total }}</p>
         <p>État: {{ order.status }}</p>
         <button v-if="order.status === 'waiting_payment'" @click="payOrder(order.uuid)">Payer</button>

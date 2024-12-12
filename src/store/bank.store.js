@@ -1,47 +1,79 @@
-import BankService from '../services/bankaccount.service'
+import BankService from '../services/bank.service';
 
 const state = () => ({
-    // state = les données centralisées
-    account: '',
+    bankAccount: '',
     accountAmount: 0,
-    accountTransactions : [],
-    accountNumberError : 0,
+    accountTransactions: [],
 });
-// mutations = fonctions synchrones pour mettre à jour le state (!!! interdit de modifier directement le state)
+
 const mutations = {
-    updateAccountAmount(state, mount) {
-        state.accountAmount = mount
+    updateAccount(state, account) {
+        state.bankAccount = account;
+    },
+    updateAccountAmount(state, amount) {
+        state.accountAmount = amount;
     },
     updateAccountTransactions(state, transactions) {
-        state.accountTransactions = transactions;
+        if (state.accountTransactions.length === 0) {
+            state.accountTransactions = transactions;
+        }
     },
-    updateAccountNumberError(state, error) {
-        state.accountNumberError = error
+    addTransaction(state, transaction) {
+        state.accountTransactions.push(transaction);
     },
 };
-// actions = fonctions asynchrone pour mettre à jour le state, en faisant appel aux mutations, via la fonction commit()
+
 const actions = {
-    async getAccountAmount({commit}, data) {
-        let response = await BankService.getAccountAmount(data)
+    async getAccount({ commit }, data) {
+        let response = await BankService.getAccount(data);
         if (response.error === 0) {
-            commit('updateAccountAmount', response.data)
-            commit('updateAccountNumberError', 1)
-        }
-        else {
-            commit('updateAccountNumberError', -1)
+            commit('updateAccount', response.data);
+        } else {
             return response;
         }
     },
-    async getAccountTransaction({commit}, data) {
-        let response = await BankService.getAccountTransaction(data)
+    async getAccountAmount({ commit }, data) {
+        let response = await BankService.getAccountAmount(data);
         if (response.error === 0) {
-            commit('updateAccountTransactions', response.data)
-            commit('updateAccountNumberError', 1)
-        }
-        else {
-            commit('updateAccountNumberError', -1)
+            commit('updateAccountAmount', response.data);
+        } else {
             return response;
         }
+    },
+    async getAccountTransactions({ commit }, data) {
+        let response = await BankService.getAccountTransactions(data);
+        if (response.error === 0) {
+            commit('updateAccountTransactions', response.data);
+        } else {
+            return response;
+        }
+    },
+    async createWithdrawal({ commit, state }, { number, amount }) {
+        const response = await BankService.createWithdrawal({ number, amount });
+        if (response.error === 0) {
+            commit('updateAccountAmount', state.accountAmount - response.data.amount);
+            commit('addTransaction', response.data.transaction);
+
+            return { error: 0, status: 200, uuid: response.data.transaction.uuid };
+        } else {
+            return response;
+        }
+    },
+    async createPayment({ commit, state }, { number, amount, recipient }) {
+        const response = await BankService.createPayment({ number, amount, recipient });
+        if (response.error === 0) {
+            commit('updateAccountAmount', state.accountAmount - response.data.amount);
+            commit('addTransaction', response.data.transaction);
+
+            return { error: 0, status: 200, uuid: response.data.transaction.uuid };
+        } else {
+            return response;
+        }
+    },
+    async bankLogout({ commit }) {
+        commit('updateAccount', '');
+        commit('updateAccountAmount', 0);
+        commit('updateAccountTransactions', []);
     },
 };
 

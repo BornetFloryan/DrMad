@@ -1,12 +1,9 @@
 <template>
   <div>
+    <h1>Banque</h1>
     <NavBar :links="navLinks" />
     <div class="container">
-      <VerticalMenu :items="menuItems">
-        <template v-slot:menu-title="{ label }">
-          <div><strong><u>{{ label }}</u></strong></div>
-        </template>
-      </VerticalMenu>
+      <VerticalMenu :items="menuItems" />
       <router-view name="bankmain"></router-view>
     </div>
   </div>
@@ -15,22 +12,33 @@
 <script>
 import NavBar from "@/components/NavBar.vue";
 import VerticalMenu from "@/components/bank/VerticalMenu.vue";
+import {mapActions, mapState} from 'vuex';
 
 export default {
   name: 'BankView',
-  components: {NavBar, VerticalMenu},
+  components: { NavBar, VerticalMenu },
+  computed: {
+    ...mapState('bank', ['bankAccount']),
+    navLinks() {
+      return [
+        { label: this.bankAccount ? "Déconnexion" : "Mon compte", to: this.bankAccount ? "/bank/logout" : "/bank/account" }
+      ];
+    }
+  },
   data() {
     return {
-      navLinks: [{label: "Mon compte", to: "/bank/account"}],
       menuItems: [
-        {type: "title", label: "Opérations"},
-        {type: "link", label: "Solde", to: "/bank/amount"},
-        {type: "link", label: "Débit/Virement", to: "/bank/operation"},
-        {type: "title", label: "États"},
-        {type: "link", label: "Historique", to: "/bank/history"}
+        { type: "title", label: "Opérations" },
+        { type: "link", label: "Solde", to: "/bank/amount" },
+        { type: "link", label: "Débit/Virement", to: "/bank/operation" },
+        { type: "title", label: "États" },
+        { type: "link", label: "Historique", to: "/bank/history" }
       ]
     };
-  }
+  },
+  methods:{
+    ...mapActions('bank', ['getAccountTransactions'])
+  },
 };
 </script>
 

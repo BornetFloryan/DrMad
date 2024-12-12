@@ -1,6 +1,6 @@
 import BankView from '../views/bank/BankView.vue';
 import BankHome from '../views/bank/BankHome.vue';
-import BankAccount from '../views/bank/BankAccountView.vue';
+import BankAccount from '../views/bank/BankAccount.vue';
 import BankAmount from '../views/bank/BankAmount.vue';
 import BankOperation from '../views/bank/BankOperation.vue';
 import BankHistory from '../views/bank/BankHistory.vue';

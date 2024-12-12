@@ -1,83 +1,35 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VirusesView from '../views/VirusesView.vue';
-import ShopView from '../views/ShopView.vue';
-import ShopHome from '../views/ShopHome.vue';
-import ShopBuy from '../views/ShopBuy.vue';
-import ShopPay from '../views/ShopPay.vue';
-import ShopOrders from '../views/ShopOrders.vue';
-import ShopLoginView from "@/views/ShopLoginView.vue";
-import store from '../store'; // Import the Vuex store
+
+import shopRoutes from './shop.router';
+import bankRoutes from './bank.router';
+import HomeView from '../views/HomeView.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/shop',
-    component: ShopView,
-    children: [
-      {
-        path: 'home',
-        name: 'shophome',
-        components: {
-          shopmain: ShopHome,
-        },
-        alias: ''
-      },
-      {
-        path: 'login',
-        name: 'shoplogin',
-        components: {
-          shopmain: ShopLoginView,
-        },
-      },
-      {
-        path: 'buy',
-        name: 'shopbuy',
-        components: {
-          shopmain: ShopBuy,
-        }
-      },
-      {
-        path: '/shop/pay/:orderId',
-        name: 'shoppay',
-        components: {
-          shopmain: ShopPay,
-        },
-        props: {
-          shopmain: true
-        }
-      },
-      {
-        path: 'orders',
-        name: 'shoporders',
-        components: {
-          shopmain: ShopOrders,
-        },
-      }
-    ]
+    path: '/',
+    redirect: '/home',
   },
   {
-    path: '/shop/items',
-    name: 'shopitems',
-    component: VirusesView,
+    path: '/home',
+    name: 'home',
+    component: HomeView,
   },
-  {
-    path: '/bank/account',
-    name: 'bankaccount',
-    component: () => import('../views/BankAccountView.vue')
-  }
+  ...shopRoutes,
+  ...bankRoutes,
 ];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 router.beforeEach((to, from, next) => {
-  if (!store.state.shop.shopUser && to.name !== 'shophome' && to.name !== 'shoplogin') {
-    next({ name: 'shophome' });
+  if (from.name === null && to.path !== '/home') {
+    next('/home');
   } else {
     next();
   }

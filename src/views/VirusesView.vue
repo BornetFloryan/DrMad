@@ -47,7 +47,7 @@
 
 <script>
 import {mapState} from 'vuex'
-import CheckedList from "@/components/CheckedList.vue";
+import CheckedList from "@/components/shop/CheckedList.vue";
 
 export default {
   name: 'VirusesView',

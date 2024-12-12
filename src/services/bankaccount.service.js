@@ -1,40 +1,94 @@
-import LocalSource from "@/datasource/controller";
+import LocalSource from "@/datasource/controllers/bank.controller";
 
-async function getAccountAmountFromLocalSource(number){
-    return LocalSource.getAccountAmount(number)
+async function getAccountFromLocalSource(data) {
+    return LocalSource.getAccount(data);
 }
 
-async function getAccountTransactionFromLocalSource(account){
-    return LocalSource.getAccountTransaction(account)
+async function getTransactionsFromLocalSource(data) {
+    return LocalSource.getTransactions(data);
 }
 
-async function getAccountAmount(number){
+async function createWithdrawalFromLocalSource(data) {
+    return LocalSource.createWithdrawal(data);
+}
+
+async function createPaymentFromLocalSource(data) {
+    return LocalSource.createPayment(data);
+}
+
+async function getAccountAmountFromLocalSource(number) {
+    return LocalSource.getAccountAmount(number);
+}
+
+async function getAccountTransactionFromLocalSource(account) {
+    return LocalSource.getAccountTransaction(account);
+}
+
+async function getAccount(data) {
     let response = null;
     try {
-        // changer la mÃ©thode appelÃ©e quand cette fonctionnalitÃ© l'API est prÃªte
-        response = await getAccountAmountFromLocalSource(number)
+        response = await getAccountFromLocalSource(data);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
     }
-        // NB: le catch n'aura lieu que pour des requÃªte vers l'API, s'il y a une erreur rÃ©seau
-    catch(err) {
-        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de rÃ©cupÃ©rer la liste des viruses'  }
-    }
-    return response
+    return response;
 }
 
-async function getAccountTransaction(account){
+async function getTransactions(data) {
     let response = null;
     try {
-        // changer la mÃ©thode appelÃ©e quand cette fonctionnalitÃ© l'API est prÃªte
-        response = await getAccountTransactionFromLocalSource(account)
+        response = await getTransactionsFromLocalSource(data);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
     }
-        // NB: le catch n'aura lieu que pour des requÃªte vers l'API, s'il y a une erreur rÃ©seau
-    catch(err) {
-        response = {error: 1, status: 404, data: 'erreur rÃ©seau, impossible de rÃ©cupÃ©rer la liste des viruses'  }
+    return response;
+}
+
+async function createWithdrawal(data) {
+    let response = null;
+    try {
+        response = await createWithdrawalFromLocalSource(data);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
     }
-    return response
+    return response;
+}
+
+async function createPayment(data) {
+    let response = null;
+    try {
+        response = await createPaymentFromLocalSource(data);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
+    }
+    return response;
+}
+
+async function getAccountAmount(number) {
+    let response = null;
+    try {
+        response = await getAccountAmountFromLocalSource(number);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
+    }
+    return response;
+}
+
+async function getAccountTransaction(account) {
+    let response = null;
+    try {
+        response = await getAccountTransactionFromLocalSource(account);
+    } catch (err) {
+        response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
+    }
+    return response;
 }
 
 export default {
+    getAccount,
+    getTransactions,
+    createWithdrawal,
+    createPayment,
     getAccountAmount,
-    getAccountTransaction,
-}
+    getAccountTransaction
+};

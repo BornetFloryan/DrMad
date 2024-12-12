@@ -1,50 +1,60 @@
 <template>
   <div class="nav-bar">
-    <div v-if="!shopUser">
-      <button @click="menuClicked(index)" v-for="(title, index) in titles" :key="index" :style="{ backgroundColor: title.color }">
-        {{ title.text }}
-      </button>
-    </div>
-    <div v-else>
-      <button @click="menuClicked(index)" v-for="(title, index) in loggedTitles" :key="index" :style="{ backgroundColor: title.color }">
-        {{ title.text }}
-      </button>
-    </div>
+    <button
+        v-for="(link, index) in links"
+        :key="index"
+        :style="{ backgroundColor: link.color || '#444' }"
+        @click="handleClick(link)"
+    >
+      <slot name="nav-button" :label="link.label">{{ link.label }}</slot>
+    </button>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: 'NavBar',
   props: {
-    titles: Array,
-    loggedTitles: Array,
-  },
-  computed: {
-    ...mapState('shop', ['shopUser']),
-  },
-  methods: {
-    menuClicked(index) {
-      this.$emit('menu-clicked', index);
+    links: {
+      type: Array,
+      required: true,
     },
   },
-}
+  methods: {
+    handleClick(link) {
+      if (link.action === 'logout') {
+        this.$emit('logout');
+      } else if (this.$route.path !== link.to) {
+        this.$router.push(link.to);
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
 .nav-bar {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  background-color: lightgray;
+  background-color: #333;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button {
-  padding: 10px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  color: white;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin: 0 5px;
+  background-color: #444;
+}
+
+button:hover {
+  background-color: #555;
 }
 </style>

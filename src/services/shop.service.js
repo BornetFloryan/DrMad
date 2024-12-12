@@ -1,4 +1,4 @@
-import LocalSource from "@/datasource/controller";
+import LocalSource from "@/datasource/controllers/shop.controller";
 
 async function shopLoginFromLocalSource(data) {
     // rÃ©cupÃ©ration auprÃ¨s de la source locale
@@ -36,9 +36,9 @@ async function createOrderFromLocalSource(data) {
     return LocalSource.createOrder(data)
 }
 
-async function finalizeOrderFromLocalSource(orderId, userId) {
+async function finalizeOrderFromLocalSource(orderId, transactionID, userId) {
     // rÃ©cupÃ©ration auprÃ¨s de la source locale
-    return LocalSource.finalizeOrder(orderId, userId)
+    return LocalSource.finalizeOrder(orderId, transactionID, userId)
 }
 
 async function getOrdersFromLocalSource(userId) {
@@ -137,10 +137,10 @@ async function createOrder(data) {
     return response
 }
 
-async function finalizeOrder(orderId, userId) {
+async function finalizeOrder(orderId, transactionID, userId) {
     let response = null;
     try {
-        response = await finalizeOrderFromLocalSource(orderId, userId);
+        response = await finalizeOrderFromLocalSource(orderId, transactionID, userId);
     } catch (err) {
         response = { error: 1, status: 404, data: 'Network error, unable to finalize order' };
     }

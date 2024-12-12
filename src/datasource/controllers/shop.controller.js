@@ -1,4 +1,4 @@
-import { items, shopusers, bankaccounts, transactions } from './data'
+import { items, shopusers } from '../data'
 import { v4 as uuidv4 } from 'uuid'
 const bcrypt = require('bcryptjs');
 
@@ -38,35 +38,6 @@ function shopLogin(data) {
 
 function getAllViruses() {
   return { error: 0, data: items }
-}
-
-function getAccountAmount(number) {
-  if (!number) return { error: 1, status: 404, data: 'aucun compte' }
-
-  let account = bankaccounts.find(e => e.number === number.number)
-
-  if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
-
-  let amount = account.amount
-  return { error: 0, status: 200, data: amount }
-}
-
-function getAccountTransaction(number) {
-  if (!number) return { error: 1, status: 404, data: 'aucun compte' }
-  let account = bankaccounts.find(e => e.number === number.number)
-  if (!account) return { error: 1, status: 404, data: "compte incorrect" }
-  let accountTransactions = transactions.filter(e => e.account === account._id)
-
-  let transactionsData = accountTransactions.map(transaction => {
-    return {
-      account: transaction.account,
-      amount: transaction.amount,
-      date: transaction.date,
-      uuid: transaction.uuid
-    }
-  });
-
-  return { error: 0, status: 200, data: transactionsData }
 }
 
 function updateBasket(data) {
@@ -163,7 +134,11 @@ async function createOrder(data) {
   return { error: 0, data: { uuid: order.uuid } };
 }
 
-async function finalizeOrder(orderId, userId) {
+async function finalizeOrder(orderId, transactionID, userId) {
+  if(!orderId || !transactionID) {
+    return { error: 1, status: 404, data: 'Order ID or transaction ID not provided' };
+  }
+
   const user = shopusers.find(u => u._id === userId);
   if (!user) {
     return { error: 1, status: 404, data: 'User not found' };
@@ -203,8 +178,6 @@ function cancelOrder(orderId, userId) {
 export default {
   shopLogin,
   getAllViruses,
-  getAccountAmount,
-  getAccountTransaction,
   updateBasket,
   getBasket,
   removeItemFromBasket,

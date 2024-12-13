@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="basket-list">
+    <h1>Votre Panier</h1>
     <CheckedList
         :data="processedData"
         :fields="['name', 'amount']"
@@ -11,8 +12,10 @@
         @item-button-clicked="removeItem"
         @list-button-clicked="handleClearBasket"
     />
-    <div>Total Price: {{ totalPrice }}</div>
-    <button @click="createOrder">Acheter</button>
+    <div class="total-price">
+      Total : {{ totalPrice }}
+    </div>
+    <button @click="createOrder" class="buy-button">Acheter</button>
   </div>
 </template>
 
@@ -68,7 +71,7 @@ export default {
       if (response.error === 0) {
         this.clearBasket();
         let orderId = response.data.uuid;
-        this.$router.push({ name: 'shoppay', params: { orderId } });
+        this.$router.push({name: 'shoppay', params: {orderId}});
       } else {
         console.error('Failed to place order:', response.data);
       }
@@ -81,4 +84,48 @@ export default {
 </script>
 
 <style scoped>
+.basket-list {
+  font-family: 'Arial', sans-serif;
+  width: 100%;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.total-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 20px;
+}
+
+.buy-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 30px;
+}
+
+.buy-button:hover {
+  background-color: #45a049;
+}
+
+.buy-button:active {
+  background-color: #3e8e41;
+}
 </style>

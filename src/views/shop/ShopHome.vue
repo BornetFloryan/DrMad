@@ -1,30 +1,27 @@
 <template>
-  <div>
+  <div class="shop-home">
     <h1>Bienvenue à la boutique</h1>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
-
 export default {
   name: 'ShopHome',
-  components: {},
-  data: () => ({
-  }),
-  computed: {
-    ...mapState('', ['']),
-  },
-  methods: {
-  },
-  watch: {
-  }
 }
 </script>
 
 <style scoped>
-  h1 {
-    text-align: center;
-  }
+.shop-home {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
 
+h1 {
+  color: #333;
+  font-size: 2.5rem;
+}
 </style>

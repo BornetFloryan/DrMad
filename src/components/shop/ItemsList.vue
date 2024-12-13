@@ -116,4 +116,40 @@ export default {
 </script>
 
 <style scoped>
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+span {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #555;
+}
+
+label {
+  font-size: 1rem;
+  margin-right: 10px;
+}
+
+input[type="checkbox"], input[type="text"], input[type="number"] {
+  margin-bottom: 10px;
+  margin-top: 5px;
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="checkbox"]:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+hr {
+  margin: 20px 0;
+  border-top: 1px solid #ccc;
+}
 </style>

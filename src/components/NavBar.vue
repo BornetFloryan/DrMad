@@ -37,24 +37,32 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #333;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  top: 0;
+  z-index: 1000;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
   cursor: pointer;
   color: white;
   font-size: 16px;
-  transition: background-color 0.3s ease;
-  margin: 0 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  margin: 0 10px;
   background-color: #444;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 button:hover {
-  background-color: #555;
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+button:active {
+  transform: scale(0.95);
+  box-shadow: none;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="logout-view">
     <h1>Déconnexion du compte</h1>
   </div>
 </template>
@@ -23,3 +23,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.logout-view {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  font-size: 2.5rem;
+}
+</style>

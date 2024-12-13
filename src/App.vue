@@ -18,8 +18,8 @@ export default {
   components: {NavBar},
   data: () => ({
     navLinks: [
-      {label: "Boutique", to: "/shop", color: "blue"},
-      {label: "Banque", to: "/bank", color: "green"},
+      {label: "Boutique", to: "/shop", color: "#1E90FF"},
+      {label: "Banque", to: "/bank", color: "#32CD32"},
     ],
   }),
   methods: {
@@ -30,3 +30,6 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+</style>

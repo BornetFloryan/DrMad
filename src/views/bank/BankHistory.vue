@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="bank-history">
     <h1><slot>Opérations passées</slot></h1>
-    <div>
+    <div class="filter-section">
       <input type="checkbox" v-model="filterByPeriod" id="filterByPeriod" />
       <label for="filterByPeriod">Filtrer par période</label>
     </div>
-    <div v-if="filterByPeriod">
+    <div v-if="filterByPeriod" class="date-filters">
       <label for="startDate">Du</label>
       <input type="date" v-model="startDate" @change="validateDates" id="startDate" />
       <label for="endDate">Au</label>
@@ -24,7 +24,7 @@ import DataTable from '@/components/bank/DataTable.vue';
 
 export default {
   name: 'BankHistory',
-  components: { DataTable },
+  components: {DataTable},
   data() {
     return {
       filterByPeriod: false,
@@ -79,9 +79,9 @@ export default {
       return `${day}/${month}/${year}`;
     },
     showDetails(item) {
-      if(item.recipientTransactionUuid) {
+      if (item.recipientTransactionUuid) {
         alert(`Transaction UUID: ${item.recipientTransactionUuid}`);
-      }else{
+      } else {
         alert(`Transaction UUID: ${item.uuid}`);
       }
     },
@@ -97,4 +97,48 @@ export default {
 </script>
 
 <style scoped>
+.bank-history {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-section input {
+  margin-right: 10px;
+}
+
+.date-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.date-filters label {
+  font-weight: bold;
+}
+
+.date-filters input {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
 </style>

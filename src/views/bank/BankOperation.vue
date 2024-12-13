@@ -1,21 +1,20 @@
 <template>
-  <div>
+  <div class="bank-operation">
     <h1><slot>Débit / Virement</slot></h1>
-    <input type="number" v-model="amount" placeholder="Somme"  min="0"/>
-    <label>
+    <input type="number" v-model="amount" placeholder="Somme" min="0" class="input-field"/>
+    <label class="checkbox-label">
       <input type="checkbox" v-model="isTransfer" />
       Destinataire
     </label>
-    <input v-if="isTransfer" v-model="recipientAccount" placeholder="Numéro de compte destinataire" />
-    <button @click="validateTransfer">Valider</button>
-    <p v-if="successMessage">{{ successMessage }}</p>
-    <p>{{accountAmount}}</p>
+    <input v-if="isTransfer" v-model="recipientAccount" placeholder="Numéro de compte destinataire" class="input-field"/>
+    <button @click="validateTransfer" class="validate-button">Valider</button>
+    <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState} from 'vuex';
-import {bankaccounts} from "@/datasource/data";
+import { mapActions, mapState } from 'vuex';
+import { bankaccounts } from "@/datasource/data";
 
 export default {
   name: 'BankOperation',
@@ -52,7 +51,7 @@ export default {
             recipient: recipient._id
           });
         } else {
-          response = await this.createWithdrawal({number: this.bankAccount._id, amount: this.amount});
+          response = await this.createWithdrawal({ number: this.bankAccount._id, amount: this.amount });
         }
         if (response && response.error !== 0) {
           alert(`Erreur: ${response.data}`);
@@ -78,4 +77,63 @@ export default {
 </script>
 
 <style scoped>
+.bank-operation {
+  font-family: 'Arial', sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+.checkbox-label {
+  font-size: 1rem;
+  color: #333;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.validate-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.validate-button:hover {
+  background-color: #45a049;
+}
+
+.validate-button:active {
+  background-color: #3e8e41;
+}
+
+.success-message {
+  color: green;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 20px;
+}
 </style>

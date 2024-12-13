@@ -3,7 +3,7 @@ import ShopHome from '../views/shop/ShopHome.vue';
 import ShopBuy from '../views/shop/ShopBuy.vue';
 import ShopPay from '../views/shop/ShopPay.vue';
 import ShopOrders from '../views/shop/ShopOrders.vue';
-import ShopLoginView from '../views/shop/ShopLoginView.vue';
+import ShopLoginView from '../views/shop/ShopLogin.vue';
 
 export default [
     {

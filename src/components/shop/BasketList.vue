@@ -7,9 +7,11 @@
         :checked="checked"
         :itemButton="{ show: true, text: 'Supprimer' }"
         :listButton="{ show: true, text: 'Vider le panier' }"
+        :itemAmount="false"
         @item-button-clicked="removeItem"
         @list-button-clicked="handleClearBasket"
     />
+    <div>Total Price: {{ totalPrice }}</div>
     <button @click="createOrder">Acheter</button>
   </div>
 </template>
@@ -33,8 +35,18 @@ export default {
       return this.basket.items.map(item => ({
         name: item.item.name,
         amount: item.amount,
+        price: item.item.price,
         ...item
       }));
+    },
+    totalPrice() {
+      return this.basket.items.reduce((total, item) => {
+        const applicablePromotion = item.item.promotion
+            .filter(promo => item.amount >= promo.amount)
+            .sort((a, b) => b.amount - a.amount)[0];
+        const discount = applicablePromotion ? applicablePromotion.discount : 0;
+        return total + (item.item.price * item.amount) * (1 - discount / 100);
+      }, 0);
     }
   },
   methods: {
@@ -69,5 +81,4 @@ export default {
 </script>
 
 <style scoped>
-/* Add your component-specific styles here */
 </style>

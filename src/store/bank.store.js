@@ -40,8 +40,8 @@ const actions = {
             return response;
         }
     },
-    async getAccountTransactions({ commit }, data) {
-        let response = await BankService.getAccountTransactions(data);
+    async getAccountTransactions({ commit }) {
+        let response = await BankService.getAccountTransactions();
         if (response.error === 0) {
             commit('updateAccountTransactions', response.data);
         } else {
@@ -54,7 +54,7 @@ const actions = {
             commit('updateAccountAmount', state.accountAmount - response.data.amount);
             commit('addTransaction', response.data.transaction);
 
-            return { error: 0, status: 200, uuid: response.data.transaction.uuid };
+            return { error: 0, status: 200, data: response.data };
         } else {
             return response;
         }
@@ -65,7 +65,7 @@ const actions = {
             commit('updateAccountAmount', state.accountAmount - response.data.amount);
             commit('addTransaction', response.data.transaction);
 
-            return { error: 0, status: 200, uuid: response.data.transaction.uuid };
+            return { error: 0, status: 200, data: response.data };
         } else {
             return response;
         }
@@ -73,7 +73,6 @@ const actions = {
     async bankLogout({ commit }) {
         commit('updateAccount', '');
         commit('updateAccountAmount', 0);
-        commit('updateAccountTransactions', []);
     },
 };
 

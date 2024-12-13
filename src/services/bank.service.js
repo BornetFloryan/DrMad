@@ -16,8 +16,8 @@ async function getAccountAmountFromLocalSource(data) {
     return LocalSource.getAccountAmount(data);
 }
 
-async function getAccountTransactionsFromLocalSource(account) {
-    return LocalSource.getAccountTransactions(account);
+async function getAccountTransactionsFromLocalSource() {
+    return LocalSource.getAccountTransactions();
 }
 
 async function getAccount(data) {
@@ -60,10 +60,10 @@ async function getAccountAmount(number) {
     return response;
 }
 
-async function getAccountTransactions(account) {
+async function getAccountTransactions() {
     let response = null;
     try {
-        response = await getAccountTransactionsFromLocalSource(account);
+        response = await getAccountTransactionsFromLocalSource();
     } catch (err) {
         response = { error: 1, status: 404, data: 'erreur réseau, impossible de récupérer la liste des viruses' };
     }

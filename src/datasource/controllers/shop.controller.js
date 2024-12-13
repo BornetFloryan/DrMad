@@ -1,4 +1,4 @@
-import { items, shopusers } from '../data'
+import {bankaccounts, items, shopusers} from '../data'
 import { v4 as uuidv4 } from 'uuid'
 const bcrypt = require('bcryptjs');
 
@@ -137,8 +137,8 @@ async function createOrder(data) {
   return { error: 0, data: { uuid: order.uuid } };
 }
 
-async function finalizeOrder(orderId, transactionID, userId) {
-  if(!orderId || !transactionID) {
+async function finalizeOrder(orderId, transaction, userId) {
+  if (!orderId || !transaction) {
     return { error: 1, status: 404, data: 'Order ID or transaction ID not provided' };
   }
 
@@ -150,6 +150,23 @@ async function finalizeOrder(orderId, transactionID, userId) {
   const order = user.orders.find(o => o.uuid === orderId);
   if (!order) {
     return { error: 1, status: 404, data: 'Order not found' };
+  }
+
+  let transactionAmount = Number(transaction.amount);
+  const orderTotal = Number(order.total);
+
+  if(transactionAmount < 0){
+    transactionAmount = -transactionAmount
+  }
+
+  if (transactionAmount !== orderTotal) {
+    return { error: 1, status: 404, data: 'Transaction amount does not match order total' };
+  }
+
+  const bankAccount = bankaccounts.find(u => u.number === 'FRSHOP4578901234567890-0000999');
+
+  if (transaction.account !== bankAccount._id) {
+    return { error: 1, status: 404, data: 'Transaction account does not match shop account' };
   }
 
   order.status = 'finalized';

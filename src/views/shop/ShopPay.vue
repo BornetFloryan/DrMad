@@ -5,20 +5,24 @@
       <label for="orderId">Order ID:</label>
       <input type="text" v-model="localOrderId" id="orderId">
     </div>
-    <p>Date: {{ orderDetails.date }}</p>
-    <p>Total: {{ orderDetails.total }}</p>
+    <div v-if="localOrderId">
+      <p>Date: {{ orderDetails.date }}</p>
+      <p>Total: {{ orderDetails.total }}</p>
+    </div>
+
     <div>
       <label for="transactionId">UUID de transaction bancaire:</label>
       <input v-model="transactionId" placeholder="UUID de transaction bancaire" id="transactionId" />
     </div>
     <button @click="payOrder">Payer</button>
     <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+    <p>{{accountTransactions}}</p>
   </div>
 </template>
 
 <script>
 import ShopService from "@/services/shop.service";
-import { mapState } from "vuex";
+import {mapActions, mapState} from "vuex";
 
 export default {
   name: 'ShopPay',
@@ -37,6 +41,7 @@ export default {
   },
   computed: {
     ...mapState('shop', ['shopUser']),
+    ...mapState('bank', ['accountTransactions']),
     orderDetails() {
       if (!this.shopUser || !this.shopUser.orders) {
         return { date: '', total: '' };
@@ -46,11 +51,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions('bank', ['getAccountTransactions']),
     async payOrder() {
       this.errorMessage = '';
       try {
-        const response = await ShopService.finalizeOrder(this.localOrderId, this.transactionId, this.shopUser._id);
+        const transaction = this.accountTransactions.find(t => t.uuid === this.transactionId || t.recipientTransactionUuid === this.transactionId);
+        if (!transaction) {
+          this.errorMessage = 'Transaction not found.';
+          return;
+        }
+        const response = await ShopService.finalizeOrder(this.localOrderId, transaction, this.shopUser._id);
         if (response.error === 0) {
+          this.localOrderId = '';
           this.$router.push('/shop/orders');
         } else {
           this.errorMessage = response.data;
@@ -59,8 +71,10 @@ export default {
         this.errorMessage = 'An error occurred during payment.';
         console.error(error);
       }
-      this.localOrderId = '';
-    }
+    },
+  },
+  mounted() {
+    this.getAccountTransactions();
   }
 };
 </script>

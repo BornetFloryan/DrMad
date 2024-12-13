@@ -36,9 +36,9 @@ async function createOrderFromLocalSource(data) {
     return LocalSource.createOrder(data)
 }
 
-async function finalizeOrderFromLocalSource(orderId, transactionID, userId) {
+async function finalizeOrderFromLocalSource(orderId, transaction, userId) {
     // rÃ©cupÃ©ration auprÃ¨s de la source locale
-    return LocalSource.finalizeOrder(orderId, transactionID, userId)
+    return LocalSource.finalizeOrder(orderId, transaction, userId)
 }
 
 async function getOrdersFromLocalSource(userId) {
@@ -137,10 +137,10 @@ async function createOrder(data) {
     return response
 }
 
-async function finalizeOrder(orderId, transactionID, userId) {
+async function finalizeOrder(orderId, transaction, userId) {
     let response = null;
     try {
-        response = await finalizeOrderFromLocalSource(orderId, transactionID, userId);
+        response = await finalizeOrderFromLocalSource(orderId, transaction, userId);
     } catch (err) {
         response = { error: 1, status: 404, data: 'Network error, unable to finalize order' };
     }

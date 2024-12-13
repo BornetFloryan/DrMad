@@ -15,7 +15,6 @@
       <template #itemButton>Détails</template>
       <template #tableButton>Voir</template>
     </DataTable>
-    <p>{{accountTransactions}}</p>
   </div>
 </template>
 
@@ -41,7 +40,11 @@ export default {
   computed: {
     ...mapState('bank', ['bankAccount', 'accountTransactions']),
     filteredTransactions() {
-      let transactions = this.accountTransactions.slice().sort((a, b) => new Date(b.date['$date']) - new Date(a.date['$date']));
+      let transactions = this.accountTransactions
+          .filter(t => t.account === this.bankAccount._id)
+          .slice()
+          .sort((a, b) => new Date(b.date['$date']) - new Date(a.date['$date']));
+
       if (this.filterByPeriod) {
         if (this.startDate) {
           transactions = transactions.filter(t => new Date(t.date['$date']) >= new Date(this.startDate));
@@ -50,12 +53,13 @@ export default {
           transactions = transactions.filter(t => new Date(t.date['$date']) <= new Date(this.endDate));
         }
       }
+
       return transactions.map(transaction => ({
         ...transaction,
         date: this.formatDate(transaction.date['$date']),
         sourceDestination: transaction.amount < 0 ? 'S' : 'D'
       }));
-    }
+    },
   },
   methods: {
     ...mapActions('bank', ['getAccountTransactions']),
@@ -75,15 +79,19 @@ export default {
       return `${day}/${month}/${year}`;
     },
     showDetails(item) {
-      alert(`Transaction UUID: ${item.uuid}`);
+      if(item.recipientTransactionUuid) {
+        alert(`Transaction UUID: ${item.recipientTransactionUuid}`);
+      }else{
+        alert(`Transaction UUID: ${item.uuid}`);
+      }
     },
     showSelectedDetails(selectedItems) {
-      const selectedUuids = selectedItems.map(t => t.uuid);
+      const selectedUuids = selectedItems.map(t => t.recipientTransactionUuid || t.uuid);
       alert(`Selected Transactions UUIDs: ${selectedUuids.join(', ')}`);
     }
   },
   mounted() {
-    this.getAccountTransactions(this.bankAccount);
+    this.getAccountTransactions();
   }
 };
 </script>

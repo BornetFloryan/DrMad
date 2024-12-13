@@ -10,7 +10,7 @@ function getAccount(data){
 
 function createWithdrawal(data){
     if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
-    let account = bankaccounts.find(e => e.number === data.number)
+    let account = bankaccounts.find(e => e._id === data.number)
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
     if (account.amount < data.amount) return { error: 1, status: 404, data: 'solde insuffisant' }
 
@@ -22,7 +22,7 @@ function createWithdrawal(data){
         uuid: uuidv4()
     };
 
-    transactions.push(transaction);
+    account.amount = Number(account.amount) - Number(data.amount);
 
     let respData = {
         amount: data.amount,
@@ -34,37 +34,40 @@ function createWithdrawal(data){
 
 function createPayment(data) {
     if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
-    let account = bankaccounts.find(e => e.number === data.number)
+    let account = bankaccounts.find(e => e._id === data.number)
     if (!account) return { error: 1, status: 404, data: 'compte incorrect' }
     if (account.amount < data.amount) return { error: 1, status: 404, data: 'solde insuffisant' }
 
-    let recipientAccount = bankaccounts.find(e => e.number === data.recipient)
+    let recipientAccount = bankaccounts.find(e => e._id === data.recipient)
     if (!recipientAccount) return { error: 1, status: 404, data: 'compte destinataire incorrect' }
-
-    const transaction = {
-        _id: uuidv4(),
-        amount: -data.amount,
-        account: data.number,
-        date: { $date: new Date().toISOString() },
-        uuid: uuidv4()
-    };
 
     const recipientTransaction = {
         _id: uuidv4(),
         amount: data.amount,
         account: data.recipient,
         date: { $date: new Date().toISOString() },
-        uuid: uuidv4()
+        uuid: uuidv4(),
     };
 
-    transactions.push(transaction);
+    const transaction = {
+        _id: uuidv4(),
+        amount: -data.amount,
+        account: data.number,
+        date: { $date: new Date().toISOString() },
+        uuid: uuidv4(),
+        recipientTransactionUuid: recipientTransaction.uuid,
+    };
+
     transactions.push(recipientTransaction);
 
-    recipientAccount.amount += data.amount;
+    account.amount = Number(account.amount) - Number(data.amount);
+    recipientAccount.amount = Number(recipientAccount.amount) + Number(data.amount);
+
 
     let respData = {
         amount: data.amount,
         transaction: transaction,
+        recipientTransaction: recipientTransaction,
     }
 
     return { error: 0, status: 200, data: respData }
@@ -81,22 +84,8 @@ function getAccountAmount(data) {
     return { error: 0, status: 200, data: amount }
 }
 
-function getAccountTransactions(data) {
-    if (!data.number) return { error: 1, status: 404, data: 'aucun compte' }
-    let account = bankaccounts.find(e => e.number === data.number)
-    if (!account) return { error: 1, status: 404, data: "compte incorrect" }
-    let accountTransactions = transactions.filter(e => e.account === account._id)
-
-    let transactionsData = accountTransactions.map(transaction => {
-        return {
-            account: transaction.account,
-            amount: transaction.amount,
-            date: transaction.date,
-            uuid: transaction.uuid
-        }
-    });
-
-    return { error: 0, status: 200, data: transactionsData }
+function getAccountTransactions() {
+    return { error: 0, status: 200, data: transactions }
 }
 
 export default {

@@ -10,15 +10,15 @@ const bcrypt = require('bcryptjs');
 
 function shopLogin(data) {
   if ((!data.login) || (!data.password))
-    return { error: 1, status: 404, data: 'aucun login/pass fourni' }
+    return { error: 1, status: 404, data: 'Aucun login/pass fourni' }
   // pour simplifier : test uniquement le login
   let user = shopusers.find(e => e.login === data.login)
   if (!user)
-    return { error: 1, status: 404, data: 'login/pass incorrect' }
+    return { error: 1, status: 404, data: 'Login/pass incorrect' }
   // vérifier le mot de passe
   const isMatch = bcrypt.compareSync(data.password, user.password)
   if (!isMatch) {
-    return { error: 1, status: 404, data: 'password incorrect' }
+    return { error: 1, status: 404, data: 'Mot de passe incorrect' }
   }
 
   // générer un uuid de session pour l'utilisateur si non existant
@@ -42,26 +42,26 @@ function getAllViruses() {
 
 function updateBasket(data) {
   if (!data.login) {
-    return { error: 1, status: 404, data: 'login not provided' };
+    return { error: 1, status: 404, data: 'Login non fourni' };
   }
 
   if (!data.item) {
-    return { error: 1, status: 404, data: 'item not provided' };
+    return { error: 1, status: 404, data: 'Article non fourni' };
   }
 
   if (!data.quantity) {
-    return { error: 1, status: 404, data: 'amount not provided' };
+    return { error: 1, status: 404, data: 'Montant non fourni' };
   }
 
   let user = shopusers.find(e => e.login === data.login.login);
   if (!user) {
-    return { error: 1, status: 404, data: 'user not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
 
   let stock = items.find(e => e._id === data.item._id).stock;
 
   if (stock < data.quantity) {
-    return { error: 1, status: 404, data: 'not enough stock' };
+    return { error: 1, status: 404, data: 'Pas assez de stock' };
   }
 
   return { error: 0, status: 200, data: data };
@@ -69,12 +69,12 @@ function updateBasket(data) {
 
 function getBasket(login) {
   if (!login) {
-    return { error: 1, status: 404, data: 'login not provided' };
+    return { error: 1, status: 404, data: 'Login non fourni' };
   }
 
   let user = shopusers.find(e => e.login === login);
   if (!user) {
-    return { error: 1, status: 404, data: 'user not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
 
   return { error: 0, status: 200, data: login };
@@ -82,21 +82,21 @@ function getBasket(login) {
 
 function removeItemFromBasket(data) {
   if (!data.login) {
-    return { error: 1, status: 404, data: 'login not provided' };
+    return { error: 1, status: 404, data: 'Login non fourni' };
   }
 
   if (!data.item) {
-    return { error: 1, status: 404, data: 'item not provided' };
+    return { error: 1, status: 404, data: 'Article non fourni' };
   }
 
   let user = shopusers.find(e => e.login === data.login.login);
   if (!user) {
-    return { error: 1, status: 404, data: 'user not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
 
   let item = user.basket.items.find(e => e.item._id === data.item.item._id);
   if (!item) {
-    return { error: 1, status: 404, data: 'item not found' };
+    return { error: 1, status: 404, data: 'Article non trouvé' };
   }
 
   return { error: 0, status: 200, data: data };
@@ -105,7 +105,7 @@ function removeItemFromBasket(data) {
 async function createOrder(data) {
   const user = shopusers.find(u => u._id === data.userId);
   if (!user) {
-    return { error: 1, status: 404, data: 'User not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
 
   const order = {
@@ -139,17 +139,17 @@ async function createOrder(data) {
 
 async function finalizeOrder(orderId, transaction, userId) {
   if (!orderId || !transaction) {
-    return { error: 1, status: 404, data: 'Order ID or transaction ID not provided' };
+    return { error: 1, status: 404, data: 'ID de commande ou ID de transaction non fourni' };
   }
 
   const user = shopusers.find(u => u._id === userId);
   if (!user) {
-    return { error: 1, status: 404, data: 'User not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
 
   const order = user.orders.find(o => o.uuid === orderId);
   if (!order) {
-    return { error: 1, status: 404, data: 'Order not found' };
+    return { error: 1, status: 404, data: 'Commande non trouvée' };
   }
 
   let transactionAmount = Number(transaction.amount);
@@ -160,23 +160,23 @@ async function finalizeOrder(orderId, transaction, userId) {
   }
 
   if (transactionAmount !== orderTotal) {
-    return { error: 1, status: 404, data: 'Transaction amount does not match order total' };
+    return { error: 1, status: 404, data: 'Le montant de la transaction ne correspond pas au total de la commande' };
   }
 
   const bankAccount = bankaccounts.find(u => u.number === 'FRSHOP4578901234567890-0000999');
 
   if (transaction.account !== bankAccount._id) {
-    return { error: 1, status: 404, data: 'Transaction account does not match shop account' };
+    return { error: 1, status: 404, data: 'Le compte de transaction ne correspond pas au compte de la boutique' };
   }
 
   order.status = 'finalized';
-  return { error: 0, data: 'Order finalized successfully' };
+  return { error: 0, data: 'Commande finalisée avec succès' };
 }
 
 function getOrders(userId) {
   const user = shopusers.find(u => u._id === userId);
   if (!user) {
-    return { error: 1, status: 404, data: 'User not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
   return { error: 0, data: user.orders || [] };
 }
@@ -184,11 +184,11 @@ function getOrders(userId) {
 function cancelOrder(orderId, userId) {
   const user = shopusers.find(u => u._id === userId);
   if (!user) {
-    return { error: 1, status: 404, data: 'User not found' };
+    return { error: 1, status: 404, data: 'Utilisateur non trouvé' };
   }
   const order = user.orders.find(o => o.uuid === orderId);
   if (!order) {
-    return { error: 1, status: 404, data: 'Order not found' };
+    return { error: 1, status: 404, data: 'Commande non trouvée' };
   }
   let status = 'cancelled';
   return { error: 0, data: {orderId, status} };

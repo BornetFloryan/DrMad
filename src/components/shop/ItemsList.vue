@@ -92,7 +92,7 @@ export default {
     async handleAddItemToBasket({index, amount}) {
       let response = await this.addItemToBasket({
         login: this.currentUser,
-        item: this.viruses[index],
+        item: this.filteredViruses[index],
         quantity: amount
       });
       if (response && response.error) {

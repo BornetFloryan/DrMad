@@ -122,15 +122,6 @@ let shopusers = [
         "orders": []
     },
     {
-        "_id": "new_unique_id_for_flo",
-        "name": "flo",
-        "login": "flo",
-        "password": "$2a$10$WmdGTvnGL598lPiWm1N9zeidgFHif/VeIMAAhB5M42tWNAFgNf7V6",
-        "email": "flo@nowhere.org",
-        "session": "00000000-0000-0000-0000-000000000000",
-        "orders": []
-    },
-    {
         "_id": "66d58122c08b4d64db14cd04",
         "name": "doctor mad",
         "login": "drmad",
